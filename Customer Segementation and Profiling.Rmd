@@ -1,0 +1,60 @@
+---
+title: "Customer Segmentation and Profiling"
+author: "Rushikesh Naidu"
+date: "March 15, 2018"
+output: word_document
+---
+
+### Introduction
+
+####The aim of the assignment is to segment customer based on their spendings in different types of goods. The dataset provides division of customers based on region and channel. Information about the dataset can be found on the Readme document.
+
+#####The dataset is not clean with some missing values. We clean the dataset first followed by removing the Channel and Region from our cleaned dataset since it is not required to cluster the data.
+```{r}
+MyData <- read.csv(file="C:/Users/Admin/Desktop/MIS584/Wholesale customers data-1.csv", header=TRUE, sep=",")
+head(MyData)
+summary(MyData)
+cleandata <- MyData
+cleandata <-  na.omit(cleandata)
+cleandata$Channel <- NULL
+cleandata$Region <- NULL
+```
+
+###Task
+
+####1.Segmentation: You will first use the data related to spending on the six products (columns c - h) to segment (cluster) the clients. You can simply use Tableau (and Excel if needed) to perform the segmentation process; however, if you are so inclined, you can use other tools and languages such as R or Python to implement a clustering algorithm and answer the questions. If you use Tableau, you can use the automatically determined number of clusters by Tableau (or you can manually change the number of clusters if you have a reason for that). Then, answer the following questions: 
+
+#####a. How many segments are created? 
+
+######The within group sum of squares does not show any specific drop after 6 clusters due to which we select the number of clusters in the dataset as 6. We will see in the next plot that this assignment answer 66% of variability of the dataset.
+
+```{r}
+cleandata <- scale(cleandata)
+within_sum_of_squares <- (nrow(cleandata)-1)*sum(apply(cleandata,2,var))
+for (i in 2:15) within_sum_of_squares[i] <- sum(kmeans(cleandata, 
+                                     centers=i)$withinss)
+plot(1:15,within_sum_of_squares, type="b", xlab="Number of Clusters",
+     ylab="Within groups sum of squares")
+#This does not give a strong elbow, but intuition shows that there is no significant drop after 6 clusters. 
+fit <- kmeans(cleandata, 6) # fit the model
+aggregate(cleandata,by=list(fit$cluster),FUN=mean) # get cluster means
+cleandata <- data.frame(cleandata, fit$cluster) #append cluster assignment
+```
+
+```{r}
+library(cluster)
+clusplot(cleandata, fit$cluster, color=TRUE, shade=TRUE, labels=2, lines=0)
+sampled <- sample(1:dim(cleandata)[1], 50)
+Sample_final <- cleandata[sampled,]
+Sample_final$Region <- NULL
+Sample_final$Channel <- NULL
+d <- dist(Sample_final, method = "euclidean") # distance matrix
+fit <- hclust(d, method="ward") 
+plot(fit) # display dendogram
+groups <- cutree(fit, k=6) # cut tree into 6 clusters
+rect.hclust(fit, k=6, border="red") # draw dendogram with red borders around the 6 clusters
+```
+
+######We can see that the cluster explain 66% of the variability in the dataset. The dendograms generated show our division of datasets in 6 different clusters. The rest of the assignment is carried out under tableau.
+
+
