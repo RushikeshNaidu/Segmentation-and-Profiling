@@ -18,3 +18,9 @@ Question 2
 a. How are the segments different in terms of the types and volumes of purchased products?
 b. How are the segments different in terms of regions? In other words, is there any significant association between specific regions and specific segments of clients?
 c. How are the segments different in terms of channels? In other words, is there any significant association between specific channels and specific segments of clients?
+
+
+
+Solution :-
+You can have a view of the segmentation of customers here. 
+https://rushikeshnaidu.github.io/Segmentation-and-Profiling/Customer_Segementation_and_Profiling.html
